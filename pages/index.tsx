@@ -59,10 +59,12 @@ export function TextGenerator(props: any) {
     
     fetch('./api/openai', requestOptions)
       .then(response => response.json())
-      .then(data => {
-        setResponseData(data);
-        setSkills(data);
-        setExperience(data);
+      .then(([experience_text, skills_text]) => {
+       //setResponseData();
+       console.log(experience_text);
+       console.log(skills_text);
+        setExperience(experience_text);
+        setSkills(skills_text);
       })
       .catch(error => console.error(error));
   };
