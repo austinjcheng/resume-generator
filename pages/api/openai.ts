@@ -1,4 +1,3 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import TextCompletion from '../../interfaces/TextCompletion'
 import express from 'express';
@@ -17,11 +16,11 @@ export default async function handler(
           method: 'POST',
           headers: {
           'Content-Type': 'application/json',
-          'Authorization': `${req.body} ${process.env.OPENAI_KEY}`,
+          'Authorization': `Bearer ${process.env.OPENAI_KEY}`,
           },
           body: JSON.stringify(
               {"model": "text-davinci-003", 
-              "prompt": `${process.env.OPENAI_PROMPT}`, 
+              "prompt": `${process.env.OPENAI_PROMPT} ${inputText}`, 
               "temperature": 0.8, 
               "max_tokens": 2000}),
       });

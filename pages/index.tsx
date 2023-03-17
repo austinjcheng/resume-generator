@@ -1,49 +1,77 @@
-import React, { useState } from 'react';
-import Background from '../styles/background.module.css';
-import Paper from '../styles/paper.module.css';
-import Input from '../styles/input.module.css';
+import React, { useState, useRef, useEffect } from 'react';
+import backgroundStyle from '../styles/background.module.css';
+import paperStyle from '../styles/paper.module.css';
+import inputStyle from '../styles/input.module.css';
+import Typed from 'typed.js';
 
 const HomePage = () => {
   return (
-    <div className={Background.container}>
+    <div className={backgroundStyle.container}>
       <h1>Resume Generator</h1>
       <p>Test</p>
-      <TextGenerator />
-      <div className={Paper.container}>
-        <h1>Austin Cheng</h1>
-        <h2>austinjcheng@gmail.com ❖ (562) 569-0311 ❖ github.com/austinjcheng</h2>
-        <hr />
-        <Projects />
-        <Education />
-      </div>
+      <StateContainer />
     </div>
   );
 };
 
-export function TextGenerator() {
+export function StateContainer() {
+  const [experienceText, setExperienceText] = useState('Loading...');
+  const [skillsText, setSkillsText] = useState('Loading...');
+
+  const setSkills = (newText: string) => {
+    setSkillsText(newText);
+  };
+
+  const setExperience = (newText: string) => {
+    setExperienceText(newText);
+  };
+
+  return (
+    <>
+      <TextGenerator setSkills={setSkills} setExperience={setExperience}/>
+          <div className={paperStyle.container}>
+            <h1>Austin Cheng</h1>
+            <h2>austinjcheng@gmail.com ❖ (562) 569-0311 ❖ github.com/austinjcheng</h2>
+            <hr />
+            <ProfessionalExperience content={experienceText}/>
+            <Projects />
+            <TechnicalSkills content={skillsText}/>
+            <Education />
+          </div>
+    </>
+  )
+}
+
+export function TextGenerator(props: any) {
   const [responseData, setResponseData] = useState(null);
-  const [inputText, setInputText] = useState('This is the input');
+  const [inputText, setInputText] = useState('Input Job Description Here');
+  const setSkills = props.setSkills;
+  const setExperience = props.setExperience;
 
-      const handleButtonClick = async () => {
-        const requestOptions = {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ input: inputText })
-        };
-        
-        fetch('./api/openai', requestOptions)
-          .then(response => response.json())
-          .then(data => setResponseData(data))
-          .catch(error => console.error(error));
-      };
+  const handleButtonClick = async () => {
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input: inputText })
+    };
+    
+    fetch('./api/openai', requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        setResponseData(data);
+        setSkills(data);
+        setExperience(data);
+      })
+      .catch(error => console.error(error));
+  };
 
-      const handleInputChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
-        setInputText(event.target.value);
-      };
+  const handleInputChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
+    setInputText(event.target.value);
+  };
 
   return (
     <div>
-      <input className={Input.container} type="text" value={inputText} onChange={handleInputChange} />
+      <input className={inputStyle.container} type="text" value={inputText} onChange={handleInputChange} />
       <button onClick={handleButtonClick}>Submit</button>
       {responseData && (
         <div>
@@ -55,18 +83,64 @@ export function TextGenerator() {
   );
 }
 
-
-export function ProfessionalExperience() {
-  
+type Content = {
+  content: string;
 }
 
-export function TechnicalSkills() {
+export function ProfessionalExperience(props: Content) {
+  const typedEl = useRef(null);
 
+  useEffect(() => {
+    const typed = new Typed(typedEl.current, {
+      strings: [JSON.stringify(props.content)],
+      typeSpeed: 50,
+    });
+
+    return () => {
+      typed.destroy();
+    };
+  }, [props.content]);
+  
+  
+  
+  return (
+    <>
+      <h1>Professional Experience</h1>
+      <span ref={typedEl} />
+    </>
+  )
+}
+
+export function TechnicalSkills(props: Content) {
+  const typedEl = useRef(null);
+  const content = props.content;
+  const json = JSON.parse(content);
+  const text = json.choices.text;
+
+  useEffect(() => {
+    const typed = new Typed(typedEl.current, {
+      strings: [text],
+      typeSpeed: 50,
+    });
+
+    return () => {
+      typed.destroy();
+    };
+  }, [props.content, text]);
+  
+  return (
+    <>
+      <hr />
+      <h1>Technical Skills</h1>
+      <span ref={typedEl} />
+    </>
+  )
 }
 
 export function Projects() {
   return (
     <>
+      <hr />
       <h1>Projects</h1>
       <h2>Ecommerce Web App</h2>
       <ul>
