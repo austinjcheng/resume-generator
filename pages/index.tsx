@@ -30,21 +30,10 @@ export function Traits() {
   const [inputText, setInputText] = useState('This is the input');
 
       const handleButtonClick = async () => {
-        const key = process.env.OPENAI_KEY;
-      const response = await fetch('https://api.openai.com/v1/completions', {
-          method: 'POST',
-          headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ` + {key},
-          },
-          body: JSON.stringify(
-              {"model": "text-davinci-003", 
-              "prompt": "Give me a lateral thinking riddle ", 
-              "temperature": .8, 
-              "max_tokens": 2000}),
-      });
-      const data = await response.json();
-      setResponseData(data);
+        fetch('./api/openai')
+          .then(response => response.json())
+          .then(data => setResponseData(data))
+          .catch(error => console.error(error));
       };
 
       const handleInputChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
