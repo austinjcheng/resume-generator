@@ -15,14 +15,16 @@ const HomePage = () => {
 };
 
 export function StateContainer() {
-  const [experienceText, setExperienceText] = useState('Loading...');
-  const [skillsText, setSkillsText] = useState('Loading...');
+  const [experienceText, setExperienceText] = useState('{}');
+  const [skillsText, setSkillsText] = useState('{}');
 
   const setSkills = (newText: string) => {
+    console.log(`Skills set to ${newText}`);
     setSkillsText(newText);
   };
 
   const setExperience = (newText: string) => {
+    console.log(`Experience set to ${newText}`);
     setExperienceText(newText);
   };
 
@@ -76,7 +78,7 @@ export function TextGenerator(props: any) {
       {responseData && (
         <div>
           <h2>Response Data:</h2>
-          <pre>{JSON.stringify(responseData, null, 2)}</pre>
+          <pre>{responseData}</pre>
         </div>
       )}
     </div>
@@ -89,19 +91,18 @@ type Content = {
 
 export function ProfessionalExperience(props: Content) {
   const typedEl = useRef(null);
+  const text = props.content;
 
   useEffect(() => {
     const typed = new Typed(typedEl.current, {
-      strings: [JSON.stringify(props.content)],
+      strings: [text],
       typeSpeed: 50,
     });
 
     return () => {
       typed.destroy();
     };
-  }, [props.content]);
-  
-  
+  }, [props, text]);
   
   return (
     <>
@@ -113,10 +114,8 @@ export function ProfessionalExperience(props: Content) {
 
 export function TechnicalSkills(props: Content) {
   const typedEl = useRef(null);
-  const content = props.content;
-  const json = JSON.parse(content);
-  const text = json.choices.text;
-
+  const text = props.content;
+  
   useEffect(() => {
     const typed = new Typed(typedEl.current, {
       strings: [text],
@@ -126,7 +125,7 @@ export function TechnicalSkills(props: Content) {
     return () => {
       typed.destroy();
     };
-  }, [props.content, text]);
+  }, [props, text]);
   
   return (
     <>

@@ -23,9 +23,10 @@ export default async function handler(
               "prompt": `${process.env.OPENAI_PROMPT} ${inputText}`, 
               "temperature": 0.8, 
               "max_tokens": 2000}),
-      });
-      const data = await response.json();
-      console.log(data);
+          }
+  );
+  const data = await response.json();
+  const text = data.choices[0].text;
       
-  res.status(200).json(data)
+  res.status(200).json(text)
 }
